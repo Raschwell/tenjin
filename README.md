@@ -15,6 +15,6 @@ A spaced repetition application.
         [the classical flash-card approach supposedly works well for languages, poems, or trivia,
          but I, for one, would like to apply the benefits of spaced practice to more practical fields]
 
-#Undecided
-# *Database: A database editable with your text editor of choice over a more compact one?
+Undecided
+ *Database: A database editable with your text editor of choice over a more compact one?
              
