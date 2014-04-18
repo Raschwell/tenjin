@@ -1,70 +1,74 @@
-#questions = ['Question 1', 'Question 2', 'Question 3']
-questions = ['Question ' + str(i) for i in range(3)]
-iter_q = iter(questions)
-#answers = ['Answer 1', 'Answer 2', 'Answer 3']
-answers = ['Answer ' + str(i) for i in range(3)]
-iter_a = iter(answers)
+cardlist = []
 
-question = next(iter_q)
-answer = next(iter_a)
-revealed = 0 #to prevent reveal spamming
+def start():
+    iter_cardlist = iter(cardlist)
 
-from tkinter import *
+    Card = next(iter_cardlist)
+    q = Card #Should go away pretty soon
 
-def rev_ans():
-    global revealed
-    if revealed == 0:
-        revealed = 1
-        global AnsFrame
-        AnsFrame = Frame(Root)
-        AnsFrame.pack()
-        AnsLab = Label(AnsFrame, text = answer)
-        AnsLab['font'] = ('times', 15, 'bold')
-        AnsLab['height'] = 3
-        AnsLab.pack()
-        def fun(i):
-            rate(QLab['text'], i)
-        for i in range(1,6):
-            _ = Frame(AnsFrame)
-            _.pack(side=LEFT)
-            Label(_, text = '5')\
-                .pack(side=TOP)
-            Button(_, text = str(i),\
-                   command = lambda i=i: fun(i))\
-            .pack(side=TOP)
-#            _['relief'] = FLAT
+    revealed = 0 #to prevent reveal spamming
 
+    import tkinter as tk
 
-def rate(q,x):
-    global revealed
-    if revealed == 1:
-        print(q, 'scored', x)
-        revealed = 0
-        AnsFrame.destroy()
-        if x == 1:
-            questions.append(q)
-            answers.append(questions.index(q))
-        global question
-        global answer
-        try:
-            QLab['text'] = next(iter_q)
-            answer = next(iter_a)
-        except StopIteration:
-            Revealer.destroy()
-            QLab['text'] = 'You\'re done'
-            Root.bind('<KP_Enter>', lambda dummy: Root.quit())
-            
+    def rev_ans():
+        nonlocal revealed
+        if revealed == 0:
+            revealed = 1
+            nonlocal AnsFrame
+            AnsFrame = tk.Frame(Root)
+            AnsFrame.pack()
+            AnsLab = tk.Label(AnsFrame, text = Card.answer)
+            AnsLab['font'] = ('times', 15, 'bold')
+            AnsLab['height'] = 3
+            AnsLab.pack()
+            nonlocal q 
+            def fun(i):
+                q = Card
+                rate(q, i)
+            for i in range(0,6):
+                _ = tk.Frame(AnsFrame)
+                _.pack(side=tk.LEFT)
+                tk.Label(_, text = '5')\
+                  .pack(side=tk.TOP)
+                tk.Button(_, text = str(i),\
+                          command = lambda i=i: fun(i))\
+                  .pack(side=tk.TOP)
+
+    def rate(q,x):
+        nonlocal revealed
+        if revealed == 1:
+            print(Card, 'scored', x)
+            Card.set_interval(x)
+            revealed = 0
+            AnsFrame.destroy()
+            if x in [0,1,2]:
+                cardlist.append(Card)
+            try:
+                nonlocal Card
+                Card = next(iter_cardlist)
+                QLab['text'] = Card.question
+                #answer = Card.answer
+                #AnsLab = tk.Label(AnsFrame, text = Card.answer)
+            except StopIteration:
+                Revealer.destroy()
+                QLab['text'] = 'You\'re done'
+                Root.bind('<KP_Enter>', lambda dummy: Root.destroy())
+                Root.bind('<Return>', lambda dummy: Root.destroy())
+                Root.bind('<space>',lambda dummy: Root.destroy())
         
 
-Root = Tk()
-QLab = Label(Root, text = question)
-QLab.pack()
-QLab['font'] = ('times', 20, 'bold')
-Revealer = Button(Root, text = "Reveal", command = rev_ans)
-Revealer.pack()
+    Root = tk.Tk()
+    QLab = tk.Label(Root, text = Card.question)
+    QLab.pack()
+    QLab['font'] = ('times', 20, 'bold')
+    Revealer = tk.Button(Root, text = "Reveal", command = rev_ans)
+    Revealer.pack()
+    AnsFrame = tk.Frame(Root)
 
-for x in range(1,6):
-    Root.bind('<KP_'+str(x)+'>', lambda dummy, x=x: rate(QLab['text'], x))
-
-Root.bind('<KP_Enter>', lambda dummy: rev_ans())
-Root.mainloop()
+    for x in range(0,6):
+        Root.bind('<KP_'+str(x)+'>', lambda dummy, x=x: rate(q, x))
+        Root.bind(str(x), lambda dummy, x=x: rate(q, x))
+    Root.bind('<KP_Enter>', lambda dummy: rev_ans())
+    Root.bind('<Return>', lambda dummy: rev_ans())
+    Root.bind('<space>', lambda dummy: rev_ans())
+    Root.mainloop()
