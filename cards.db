@@ -1,0 +1,33 @@
+[DEFAULT]
+schedule = 0
+interval = 0
+reps = 0
+fails = 0
+leech = 0
+ease = 2.5
+same_day = 1
+
+[Card1]
+answer = Yes
+question = Do you accept Emily as your faithful wife?
+type = FlashCard
+
+[Card2]
+answer = In the zoo
+question = Where does the chimpanze live?
+type = FlashCard
+
+[Card3]
+answer = I don't know
+question = What is the answer?
+type = FlashCard
+
+[Card4]
+question = What is the capital of Japan?
+answer = Tokyo
+type = FlashCard
+
+[Card5]
+question = What is the moon made of?
+answer = Cheese
+type = FlashCard
