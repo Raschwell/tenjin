@@ -1,7 +1,8 @@
 import time as t
 
 class Card():
-    def __init__(self,ID,question,answer,interval = 0, reps = 0,scheduled = t.time(), fails = 0, leech = 0, ease = 2.5, same_day = 1):
+    def __init__(self,ID,question,answer,interval = 0, reps = 0,scheduled = t.time(), fails = 0, leech = 0, ease = 2.5, same_day = 1, PIC = 0):
+        self.PIC = 0 #passed initial 'cram', just so that you recognize it next time
         self.fails = fails
         self.leech = leech
         self.reps = reps
@@ -14,10 +15,14 @@ class Card():
         self.same_day = same_day #if true, intervals are in minutes
         self.ID = ID
     def set_interval(self,rating):
-        self.set_ease(rating)
-        if rating == 0: #^set ease nevertheless, you failed w 2.5, after all
-            self.interval = 0
+        if self.PIC:
+            self.set_ease(rating)
+        if rating in [0,1] and self.PIC: #set ease nevertheless
+            self.interval = 0            #you failed w 2.5, after all
             self.fails += 1
+            self.reps += 1
+        if rating in [0,1,2] and not self.PIC:
+            pass
         else:
             try:
                 self.interval = \
@@ -31,9 +36,11 @@ class Card():
                 else:
                     self.interval = 1; self.ease = 2
             finally:
-                self.reps += 1
+                if not self.PIC : self.PIC = 1
+                if self.PIC:
+                    self.reps += 1
                 if self.reps > 5: self.same_day = 0
-                if self.fails > 6:
+                if self.fails > 7:
                     self.leech = 1
         if self.max_interval and self.interval > self.max_interval:
             self.interval = self.max_interval
@@ -55,15 +62,11 @@ class FlashCard(Card):
         if not flashcard:
             import flashcard
             flashcard.cardlist = cardlist['FlashCard']
-            flashcard.start()
-        
-import configparser
-carddb = configparser.ConfigParser()
-cardz = open('cards.db', 'r+')
-carddb.read_file(cardz)
+            flashcard.start()    
 
 def commit_changes():
-    config.write(carddb)
+    with open('cards.db', 'w') as configfile:
+        carddb.write(configfile)
 
 def check_schedules():
     fcarddict = {}
@@ -75,33 +78,76 @@ def check_schedules():
             answer = carddb[card]['answer']
             interval = float(carddb[card]['interval'])
             reps = int(carddb[card]['reps'])
-            schedule = int(carddb[card]['schedule'])
+            schedule = float(carddb[card]['schedule'])
+            if schedule == 0:
+                schedule = t.time()
             fails = int(carddb[card]['fails'])
             leech = int(carddb[card]['leech'])
             ease = float(carddb[card]['ease'])
             same_day = int(carddb[card]['same_day'])
+            PIC = int(carddb[card]['PIC'])
             ID = card
             fcarddict.update({card: FlashCard(ID,question,answer,interval,\
                                               reps,schedule,fails,\
-                                              leech,ease,same_day)})
+                                              leech,ease,same_day,PIC)})
             print(fcarddict.keys(),fcarddict.values())
 
     cardhandler = {'FlashCard' : flashcard_handler}
 
     for x in carddb.sections():
-        if float(carddb[x]['interval']) < t.time():
+        if float(carddb[x]['schedule']) < t.time():
+            print(float(carddb[x]['schedule']),t.time())
             cardhandler[carddb[x]['type']](x)
 
     return({'fcards': fcarddict}) #add other types later
 
-do_us = check_schedules()
-
 import flashcard
 
-for x in do_us['fcards'].values():
-    flashcard.cardlist.append(x)
+def make_changes(card):
+    carddb[card.ID]['interval'] = str(card.interval)
+    carddb[card.ID]['reps'] = str(card.reps)
+    carddb[card.ID]['schedule'] = str(card.scheduled)
+    carddb[card.ID]['fails'] = str(card.fails)
+    carddb[card.ID]['leech'] = str(card.leech)
+    carddb[card.ID]['ease'] = str(card.ease)
+    carddb[card.ID]['same_day'] = str(card.same_day)
+    carddb[card.ID]['PIC'] = str(card.PIC)
 
-flashcard.start()
+from subprocess import call
 
-for x in do_us['fcards'].values():
-    print(x.interval)
+def do_fcards():
+    try:
+        for x in do_us['fcards'].values():
+            flashcard.cardlist.append(x)
+
+        if flashcard.cardlist:
+            call(["notify-send", "You've got cards to attend to!"])
+            dummy = s.accept()
+
+        flashcard.start()
+
+        for card in do_us['fcards'].values():
+            make_changes(card)
+
+        commit_changes()
+        flashcard.cardlist = []
+    except StopIteration:
+        pass
+
+
+import configparser
+carddb = configparser.ConfigParser()
+carddb.read_file(open('cards.db'))
+
+import socket
+HOST = 'localhost'
+PORT = 61375
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind((HOST, PORT))
+s.listen(1)
+
+while 1:
+    carddb.read_file(open('cards.db'))
+    do_us = check_schedules()
+    do_fcards()
+    t.sleep(300)

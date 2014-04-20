@@ -6,6 +6,7 @@ fails = 0
 leech = 0
 ease = 2.5
 same_day = 1
+pic = 0
 
 [Card1]
 answer = Yes
@@ -30,4 +31,14 @@ type = FlashCard
 [Card5]
 question = What is the moon made of?
 answer = Cheese
+type = FlashCard
+
+[Card6]
+question = Why?
+answer = Just because
+type = FlashCard
+
+[Card7]
+question = Is that so?
+answer = Indeed
 type = FlashCard
