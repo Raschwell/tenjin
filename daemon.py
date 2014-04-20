@@ -1,5 +1,6 @@
 import time as t
 
+
 class Card():
     def __init__(self,ID,question,answer,interval = 0, reps = 0,scheduled = t.time(), fails = 0, leech = 0, ease = 2.5, same_day = 1, PIC = 0):
         self.PIC = 0 #passed initial 'cram', just so that you recognize it next time
@@ -44,6 +45,7 @@ class Card():
                     self.leech = 1
         if self.max_interval and self.interval > self.max_interval:
             self.interval = self.max_interval
+        self.interval *= random.randrange(900,1100)/1000 #generate some noise]
         self.schedule_func()
     def set_ease(self,rating):
         self.ease += (0.1 - (5 - rating) * (0.08 \
