@@ -7,3 +7,27 @@ leech = 0
 ease = 2.5
 same_day = 1
 pic = 0
+
+[Card1]
+type = FlashCard
+question = Question
+answer = Answer
+interval = 9.379999999999999
+reps = 1
+schedule = 1398542051.897393
+fails = 0
+leech = 0
+ease = 2.5
+same_day = 1
+pic = 1
+
+[Card2]
+type = EntryCard
+question = What is the capital of Japan?
+answer = Tokyo
+
+[ShortcutSet1]
+type = ShortcutDrill
+keytext = ['Save', 'Close']
+keys = [['<Control_L><x>','<Control_L><s>'],\
+        ['<Control_L><x>','<Control_L><w>']]
