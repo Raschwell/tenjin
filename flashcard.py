@@ -4,7 +4,6 @@ def start():
     iter_cardlist = iter(cardlist)
 
     Card = next(iter_cardlist)
-    q = Card #Should go away pretty soon
 
     revealed = 0 #to prevent reveal spamming
 
@@ -20,11 +19,9 @@ def start():
             AnsLab = tk.Label(AnsFrame, text = Card.answer)
             AnsLab['font'] = ('times', 15, 'bold')
             AnsLab['height'] = 3
-            AnsLab.pack()
-            nonlocal q 
+            AnsLab.pack() 
             def fun(i):
-                q = Card
-                rate(q, i)
+                rate(i)
             for i in range(0,6):
                 _ = tk.Frame(AnsFrame)
                 _.pack(side=tk.LEFT)
@@ -34,7 +31,7 @@ def start():
                           command = lambda i=i: fun(i))\
                   .pack(side=tk.TOP)
 
-    def rate(q,x):
+    def rate(x):
         nonlocal revealed
         if revealed == 1:
             print(Card, 'scored', x)
@@ -47,15 +44,12 @@ def start():
                 nonlocal Card
                 Card = next(iter_cardlist)
                 QLab['text'] = Card.question
-                #answer = Card.answer
-                #AnsLab = tk.Label(AnsFrame, text = Card.answer)
             except StopIteration:
                 Revealer.destroy()
                 QLab['text'] = 'You\'re done'
                 Root.bind('<KP_Enter>', lambda dummy: Root.destroy())
                 Root.bind('<Return>', lambda dummy: Root.destroy())
                 Root.bind('<space>',lambda dummy: Root.destroy())
-        
 
     Root = tk.Tk()
     QLab = tk.Label(Root, text = Card.question)
@@ -66,8 +60,8 @@ def start():
     AnsFrame = tk.Frame(Root)
 
     for x in range(0,6):
-        Root.bind('<KP_'+str(x)+'>', lambda dummy, x=x: rate(q, x))
-        Root.bind(str(x), lambda dummy, x=x: rate(q, x))
+        Root.bind('<KP_'+str(x)+'>', lambda dummy, x=x: rate(x))
+        Root.bind(str(x), lambda dummy, x=x: rate(x))
     Root.bind('<KP_Enter>', lambda dummy: rev_ans())
     Root.bind('<Return>', lambda dummy: rev_ans())
     Root.bind('<space>', lambda dummy: rev_ans())

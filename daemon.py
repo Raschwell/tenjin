@@ -1,5 +1,5 @@
 import time as t
-
+import random
 
 class Card():
     def __init__(self,ID,question,answer,interval = 0, reps = 0,scheduled = t.time(), fails = 0, leech = 0, ease = 2.5, same_day = 1, PIC = 0):
@@ -60,11 +60,13 @@ class Card():
         self.scheduled += self.interval * multiplier
 
 class FlashCard(Card):
-    def start_rep(self):
-        if not flashcard:
-            import flashcard
-            flashcard.cardlist = cardlist['FlashCard']
-            flashcard.start()    
+    pass
+
+class EntryCard(Card):
+    pass
+
+class KeyDrill(Card):
+    pass
 
 def commit_changes():
     with open('cards.db', 'w') as configfile:
@@ -72,6 +74,7 @@ def commit_changes():
 
 def check_schedules():
     fcarddict = {}
+    entrycarddict = {}
 
     def flashcard_handler(card):
         nonlocal fcarddict
@@ -92,18 +95,41 @@ def check_schedules():
             fcarddict.update({card: FlashCard(ID,question,answer,interval,\
                                               reps,schedule,fails,\
                                               leech,ease,same_day,PIC)})
-            print(fcarddict.keys(),fcarddict.values())
 
-    cardhandler = {'FlashCard' : flashcard_handler}
+    def entrycard_handler(card):
+        nonlocal entrycarddict
+        if card not in entrycarddict:
+            question = carddb[card]['question']
+            answer = carddb[card]['answer']
+            interval = float(carddb[card]['interval'])
+            reps = int(carddb[card]['reps'])
+            schedule = float(carddb[card]['schedule'])
+            if schedule == 0:
+                schedule = t.time()
+            fails = int(carddb[card]['fails'])
+            leech = int(carddb[card]['leech'])
+            ease = float(carddb[card]['ease'])
+            same_day = int(carddb[card]['same_day'])
+            PIC = int(carddb[card]['PIC'])
+            ID = card
+            entrycarddict.update({card: EntryCard(ID,question,answer,interval,\
+                                              reps,schedule,fails,\
+                                              leech,ease,same_day,PIC)})
+
+    cardhandler = {'FlashCard' : flashcard_handler,\
+                   'EntryCard' : entrycard_handler}
 
     for x in carddb.sections():
         if float(carddb[x]['schedule']) < t.time():
             print(float(carddb[x]['schedule']),t.time())
             cardhandler[carddb[x]['type']](x)
 
-    return({'fcards': fcarddict}) #add other types later
+    return({'fcards': fcarddict,\
+            'entrycards' : entrycarddict\
+          }) #add other types later
 
 import flashcard
+import entrycard
 
 def make_changes(card):
     carddb[card.ID]['interval'] = str(card.interval)
@@ -123,8 +149,8 @@ def do_fcards():
             flashcard.cardlist.append(x)
 
         if flashcard.cardlist:
-            call(["notify-send", "You've got cards to attend to!"])
-            dummy = s.accept()
+            call(["notify-send", "You've got flashcards to attend to!"])
+            dummy = s.accept() #wait for input
 
         flashcard.start()
 
@@ -136,6 +162,26 @@ def do_fcards():
     except StopIteration:
         pass
 
+def do_entrycards():
+    try:
+        for x in do_us['entrycards'].values():
+            entrycard.cardlist.append(x)
+
+        if entrycard.cardlist:
+            call(["notify-send", "You've got entrycards to attend to!"])
+            dummy = s.accept() #wait for input
+
+        entrycard.start()
+
+        for card in do_us['entrycards'].values:
+            make_changes(card)
+
+        commit_changes()
+        entrycard.cardlist = []
+    except StopIteration:
+        pass
+
+do_cardtype = [do_fcards, do_entrycards]
 
 import configparser
 carddb = configparser.ConfigParser()
@@ -151,5 +197,17 @@ s.listen(1)
 while 1:
     carddb.read_file(open('cards.db'))
     do_us = check_schedules()
-    do_fcards()
+    for func in do_cardtype:
+        func()
     t.sleep(300)
+
+
+def str_to_list(list_):
+#    list_ = list_.replace('\n', '')
+    list_ = list(eval(list_))
+    for x in range(len(list_)):
+        try:
+            list_[x] = str_to_list(list_[x])
+        except:
+            pass
+    return(list_)
