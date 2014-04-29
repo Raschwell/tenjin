@@ -28,6 +28,9 @@ answer = Tokyo
 
 [ShortcutSet1]
 type = ShortcutDrill
-keytext = ['Save', 'Close']
+keytext = ['Save', 'Close','End of line', 'Move screen forward', 'Next line' ]
 keys = [['<Control_L><x>','<Control_L><s>'],\
-        ['<Control_L><x>','<Control_L><w>']]
+        ['<Control_L><x>','<Control_L><w>'],\
+	['<Control_L><e>'],\
+	['<Control_L><v>'],\
+	['<Control_L><n>']]	

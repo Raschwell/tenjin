@@ -2,7 +2,7 @@ import time as t
 import random
 
 class Card():
-    def __init__(self,ID,question,answer,interval = 0, reps = 0,scheduled = t.time(), fails = 0, leech = 0, ease = 2.5, same_day = 1, PIC = 0):
+    def __init__(self,ID,question = '' ,answer = '' ,interval = 0, reps = 0,scheduled = t.time(), fails = 0, leech = 0, ease = 2.5, same_day = 1, PIC = 0):
         self.PIC = 0 #passed initial 'cram', just so that you recognize it next time
         self.fails = fails
         self.leech = leech
@@ -66,10 +66,14 @@ class EntryCard(Card):
     pass
 
 class KeyDrill(Card):
-    pass
+    def __init__(self,ID):
+        Card.__init__(self,ID)
+        self.qa = ''
+        self.keys = ''
+        self.keytext = ''
 
 def commit_changes():
-    with open('cards.db', 'w') as configfile:
+    with open(location, 'w') as configfile:
         carddb.write(configfile)
 
 def check_schedules():
@@ -173,19 +177,23 @@ def do_entrycards():
 
         entrycard.start()
 
-        for card in do_us['entrycards'].values:
+        for card in do_us['entrycards'].values():
             make_changes(card)
 
         commit_changes()
         entrycard.cardlist = []
     except StopIteration:
         pass
-
+"""
 do_cardtype = [do_fcards, do_entrycards]
 
 import configparser
+import os
+config = configparser.ConfigParser()
+config.read_file(open(os.getenv('HOME')+'/.config/tenjin/config'))
+location = config['Main']['location']
 carddb = configparser.ConfigParser()
-carddb.read_file(open('cards.db'))
+carddb.read_file(open(location))
 
 import socket
 HOST = 'localhost'
@@ -193,17 +201,18 @@ PORT = 61375
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
 s.listen(1)
-
+"""
+"""
 while 1:
-    carddb.read_file(open('cards.db'))
+    carddb.read_file(open(location))
     do_us = check_schedules()
     for func in do_cardtype:
         func()
     t.sleep(300)
-
+"""
 
 def str_to_list(list_):
-#    list_ = list_.replace('\n', '')
+#     list_ = list_.replace('\n', '')
     list_ = list(eval(list_))
     for x in range(len(list_)):
         try:
