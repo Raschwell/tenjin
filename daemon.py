@@ -66,11 +66,7 @@ class EntryCard(Card):
     pass
 
 class KeyDrill(Card):
-    def __init__(self,ID):
-        Card.__init__(self,ID)
-        self.qa = ''
-        self.keys = ''
-        self.keytext = ''
+    pass
 
 def commit_changes():
     with open(location, 'w') as configfile:
@@ -79,6 +75,7 @@ def commit_changes():
 def check_schedules():
     fcarddict = {}
     entrycarddict = {}
+    keydrilldict = {}
 
     def flashcard_handler(card):
         nonlocal fcarddict
@@ -120,8 +117,31 @@ def check_schedules():
                                               reps,schedule,fails,\
                                               leech,ease,same_day,PIC)})
 
+
+    def keydrill_handler(card):
+        nonlocal keydrilldict
+        if card not in keydrilldict:
+            question = carddb[card]['question']
+            answer = carddb[card]['answer']
+            interval = float(carddb[card]['interval'])
+            reps = int(carddb[card]['reps'])
+            schedule = float(carddb[card]['schedule'])
+            if schedule == 0:
+                schedule = t.time()
+            fails = int(carddb[card]['fails'])
+            leech = int(carddb[card]['leech'])
+            ease = float(carddb[card]['ease'])
+            same_day = int(carddb[card]['same_day'])
+            PIC = int(carddb[card]['PIC'])
+            ID = card
+            keydrilldict.update({card: KeyDrill(ID,question,answer,interval,\
+                                              reps,schedule,fails,\
+                                              leech,ease,same_day,PIC)})
+
+
     cardhandler = {'FlashCard' : flashcard_handler,\
-                   'EntryCard' : entrycard_handler}
+                   'EntryCard' : entrycard_handler,\
+                   'KeyDrill' : keydrill_handler}
 
     for x in carddb.sections():
         if float(carddb[x]['schedule']) < t.time():
@@ -129,11 +149,13 @@ def check_schedules():
             cardhandler[carddb[x]['type']](x)
 
     return({'fcards': fcarddict,\
-            'entrycards' : entrycarddict\
+            'entrycards' : entrycarddict,\
+            'keydrills' : keydrilldict\
           }) #add other types later
 
 import flashcard
 import entrycard
+import keydrill
 
 def make_changes(card):
     carddb[card.ID]['interval'] = str(card.interval)
@@ -184,8 +206,28 @@ def do_entrycards():
         entrycard.cardlist = []
     except StopIteration:
         pass
-"""
-do_cardtype = [do_fcards, do_entrycards]
+
+def do_keydrills():
+    try:
+        for x in do_us['keydrills'].values():
+            keydrill.cardlist.append(x)
+
+        if keydrill.cardlist:
+            call(["notify-send", "You've got keydrills to attend to!"])
+            dummy = s.accept() #wait for input
+
+        keydrill.start()
+
+        for card in do_us['keydrills'].values():
+            make_changes(card)
+
+        commit_changes()
+        keydrill.cardlist = []
+    except StopIteration:
+        pass
+
+
+do_cardtype = [do_fcards, do_entrycards, do_keydrills]
 
 import configparser
 import os
@@ -201,15 +243,14 @@ PORT = 61375
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind((HOST, PORT))
 s.listen(1)
-"""
-"""
+
 while 1:
     carddb.read_file(open(location))
     do_us = check_schedules()
     for func in do_cardtype:
         func()
     t.sleep(300)
-"""
+
 
 def str_to_list(list_):
 #     list_ = list_.replace('\n', '')

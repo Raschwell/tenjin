@@ -10,14 +10,20 @@ def str_to_list(list_):
             pass
     return(list_)
 
-#is one drill a session more realistic, or shall it be split?
-
 def start():
 
-    for card in cardlist:
-        card.keytext = str_to_list( card.keytext)
-        card.keys = str_to_list(card.keys)
-        card.qa = list(zip(card.keytext,card.keys))
+    for Card in cardlist:
+        Card.question = str_to_list(Card.question)
+        Card.answer = str_to_list(Card.answer)
+        Card.qa = list(zip(Card.question,Card.answer))
+
+    def make_shortcuts():
+        nonlocal choice
+        nonlocal question
+        nonlocal answer
+        choice = random.choice(range(len(Card.qa)))
+        question = Card.qa[choice][0]
+        answer = Card.qa[choice][1]
 
     iter_cardlist = iter(cardlist)
 
@@ -30,61 +36,54 @@ def start():
     import threading
     import time
 
-    has_time = 60
-
+    has_time = 2
     def timer():
         nonlocal has_time
         nonlocal Timer
         while has_time:
             time.sleep(1)
             has_time -= 1
+            print(has_time)
             Timer['text'] = has_time
         else:
-            rev_ans()
+            nonlocal AnsFrame
+            AnsFrame = tk.Frame(Root)
+            AnsFrame.pack()
+            pop_ratings()
 
-    timetrack = threading.Thread()
-    timetrack.run = timer
+    def start_timer():
+        has_time = 2
+        timetrack = threading.Thread()
+        timetrack.run = timer
+        Timer['text'] = has_time
+        timetrack.start()
 
-    choice = random.choice(range(len(card.qa)))
-#    choice = random.choice(Card.qa)
-    question = card.qa[choice][0]
-#    question = choice[0]
-#    answer = choice[1]
-    answer = card.qa[choice][1]
+    choice = random.choice(range(len(Card.qa)))
+    question = Card.qa[choice][0]
+    answer = Card.qa[choice][1]
   
     def set_key(x):
-        nonlocal Root
-        def p_d(a): #don't you dare leave this one in
-            print(a)
-            nonlocal x
-            a(x + 1)
+#        nonlocal Root
         if x + 1 == len(answer):
             Root.bind(answer[x], lambda dummy : do_next(x))
-            print('I am trying!')
         elif x + 2 == len(answer):
-            Root.bind(answer[x+1], lambda dummy: p_d(do_next))
-            print(x+1,answer[x+1],'last')
-            Root.bind(answer[x], lambda dummy : print('I do nothing'))
+            Root.bind(answer[x+1], lambda dummy: do_next(x + 1))
+            Root.bind(answer[x], lambda dummy : 'pass' )
         else:
-            Root.bind(answer[x+1], lambda dummy: p_d(set_key))
+            Root.bind(answer[x+1], lambda dummy: set_key(x + 1))
             print(x+1,answer[x+1])
-            Root.bind(answer[x], lambda dummy : print('I do nothing'))
+            Root.bind(answer[x], lambda dummy : 'pass' )
     
     def do_next(x):
         nonlocal question
         nonlocal answer
         nonlocal choice
-        print('I am doing the next!')
-        Root.bind(answer[x], lambda dummy: print('Terminating myself'))
-#        choice = random.choice(card.qa)
-        choice = random.choice(list(set(range(len(card.qa)))-{choice}))
-        question = card.qa[choice][0]
-#        question = choice[0]
+        Root.bind(answer[x], lambda dummy: print('Nothing'))
+        choice = random.choice(list(set(range(len(Card.qa)))-{choice}))
+        question = Card.qa[choice][0]
         QLab['text'] = question
-        answer = card.qa[choice][1]
-#        answer = choice[1]
+        answer = Card.qa[choice][1]
         set_key(0)
-#        Root.bind(answer[0],lambda dummy: set_key(0))
 
     def rev_ans():
         nonlocal revealed
@@ -98,59 +97,57 @@ def start():
             AnsLab['height'] = 3
             AnsLab.pack() 
 
-
-#            def fun(i):
-#                rate(i)
-#            for i in range(0,6):
-#                _ = tk.Frame(AnsFrame)
-#                _.pack(side=tk.LEFT)
-#                tk.Label(_, text = '5')\
-#                  .pack(side=tk.TOP)
-#                tk.Button(_, text = str(i),\
-#                          command = lambda i=i: fun(i))\
-#                  .pack(side=tk.TOP)
-
+    def pop_ratings():
+        def fun(i):
+            rate(i)
+        for i in range(0,6):
+            nonlocal AnsFrame
+            _ = tk.Frame(AnsFrame)
+            _.pack(side=tk.LEFT)
+            tk.Label(_, text = '5')\
+              .pack(side=tk.TOP)
+            tk.Button(_, text = str(i),\
+                      command = lambda i=i: fun(i))\
+              .pack(side=tk.TOP)
 
     def rate(x):
         nonlocal revealed
-        if revealed == 1:
-#            print(Card, 'scored', x)
-#            Card.set_interval(x)
-            revealed = 0
-            AnsFrame.destroy()
-            if x in [0,1,2]:
-                cardlist.append(Card)
-            try:
-#                nonlocal Card
-                Card = next(iter_cardlist)
-                QLab['text'] = question
-            except StopIteration:
-                Revealer.destroy()
-                QLab['text'] = 'You\'re done'
-                Root.bind('<KP_Enter>', lambda dummy: Root.destroy())
-                Root.bind('<Return>', lambda dummy: Root.destroy())
-                Root.bind('<space>',lambda dummy: Root.destroy())
+        Card.set_interval(x)
+        revealed = 0
+        AnsFrame.destroy()
+        if x in [0,1,2]:
+            cardlist.append(Card)
+        try:
+            nonlocal Card
+            Card = next(iter_cardlist)
+            QLab['text'] = question
+        except StopIteration:
+            Revealer.destroy()
+            QLab['text'] = 'You\'re done'
+            Root.bind('<KP_Enter>', lambda dummy: Root.destroy())
+            Root.bind('<Return>', lambda dummy: Root.destroy())
+            Root.bind('<space>',lambda dummy: Root.destroy())
+        start_timer()
+
+        
 
     Root = tk.Tk()
-#    Timer = tk.Label(Root, text = 'has_time')
-#    Timer.pack
-    Timer = tk.Label(Root, text = has_time)
+    Timer = tk.Label(Root)
     Timer.pack()
-    timetrack.start()
+    start_timer()
     QLab = tk.Label(Root, text = question)
     QLab.pack()
     QLab['font'] = ('times', 20, 'bold')
     Revealer = tk.Button(Root, text = "Reveal", command = rev_ans)
     Revealer.pack()
     AnsFrame = tk.Frame(Root)
-
     for x in range(0,6):
         Root.bind('<KP_'+str(x)+'>', lambda dummy, x=x: rate(x))
         Root.bind(str(x), lambda dummy, x=x: rate(x))
     Root.bind('<KP_Enter>', lambda dummy: do_next(0))
     Root.bind('<Return>', lambda dummy: do_next(0))
     Root.bind('<space>', lambda dummy: do_next(0))
-    for key in Card.keys:
+    for key in Card.answer:
         Root.bind(key, lambda dummy: fail())
     set_key(0)
     Root.mainloop()
