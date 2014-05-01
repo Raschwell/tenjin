@@ -229,7 +229,7 @@ def do_keydrills():
 
 do_cardtype = [do_fcards, do_entrycards, do_keydrills]
 
-import configparser
+"""import configparser
 import os
 config = configparser.ConfigParser()
 config.read_file(open(os.getenv('HOME')+'/.config/tenjin/config'))
@@ -250,7 +250,7 @@ while 1:
     for func in do_cardtype:
         func()
     t.sleep(300)
-
+"""
 
 def str_to_list(list_):
 #     list_ = list_.replace('\n', '')
