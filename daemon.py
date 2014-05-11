@@ -57,101 +57,143 @@ class Card():
             multiplier = 86400 #seconds in a day
         else:
             multiplier = 60 #seconds in a min
-        self.scheduled += self.interval * multiplier
+        self.scheduled = t.time() + self.interval * multiplier
 
 class FlashCard(Card):
-    pass
+    def do_cards():
+        try:
+            for x in FlashCard.carddict.values():#these should'nt be dicts anymore
+                flashcard.cardlist.append(x)
+
+            if flashcard.cardlist:
+                call(["notify-send", "You've got flashcards to attend to!"])
+                dummy = s.accept() #wait for input
+
+            flashcard.start()
+
+            for card in FlashCard.carddict.values():
+                make_changes(card)
+
+            commit_changes()
+            flashcard.cardlist = []
+        except StopIteration:
+            pass
+
+    def handler(card):
+        if card not in FlashCard.carddict:
+            question = carddb[card]['question']
+            answer = carddb[card]['answer']
+            interval = float(carddb[card]['interval'])
+            reps = int(carddb[card]['reps'])
+            schedule = float(carddb[card]['schedule'])
+            if schedule == 0:
+                schedule = t.time()
+            fails = int(carddb[card]['fails'])
+            leech = int(carddb[card]['leech'])
+            ease = float(carddb[card]['ease'])
+            same_day = int(carddb[card]['same_day'])
+            PIC = int(carddb[card]['PIC'])
+            ID = card
+            FlashCard.carddict.update({card: FlashCard(ID,question,answer,interval,\
+                                              reps,schedule,fails,\
+                                              leech,ease,same_day,PIC)})
+
 
 class EntryCard(Card):
-    pass
+    def do_cards():
+        try:
+            for x in EntryCard.carddict.values():
+                entrycard.cardlist.append(x)
+
+            if entrycard.cardlist:
+                call(["notify-send", "You've got entrycards to attend to!"])
+                dummy = s.accept() #wait for input
+
+            entrycard.start()
+
+            for card in EntryCard.carddict.values():
+                make_changes(card)
+
+            commit_changes()
+            entrycard.cardlist = []
+        except StopIteration:
+            pass
+
+    def handler(card):
+        if card not in EntryCard.carddict:
+            question = carddb[card]['question']
+            answer = carddb[card]['answer']
+            interval = float(carddb[card]['interval'])
+            reps = int(carddb[card]['reps'])
+            schedule = float(carddb[card]['schedule'])
+            if schedule == 0:
+                schedule = t.time()
+            fails = int(carddb[card]['fails'])
+            leech = int(carddb[card]['leech'])
+            ease = float(carddb[card]['ease'])
+            same_day = int(carddb[card]['same_day'])
+            PIC = int(carddb[card]['PIC'])
+            ID = card
+            EntryCard.carddict.update({card: EntryCard(ID,question,answer,interval,\
+                                              reps,schedule,fails,\
+                                              leech,ease,same_day,PIC)})
 
 class KeyDrill(Card):
-    pass
+    def do_cards():
+        try:
+            for x in KeyDrill.carddict.values():
+                keydrill.cardlist.append(x)
+
+            if keydrill.cardlist:
+                call(["notify-send", "You've got keydrills to attend to!"])
+                dummy = s.accept() #wait for input
+
+            keydrill.start()
+
+            for card in KeyDrill.carddict.values():
+                make_changes(card)
+
+            commit_changes()
+            keydrill.cardlist = []
+        except StopIteration:
+            pass
+
+    def handler(card):
+        if card not in KeyDrill.carddict:
+            question = carddb[card]['question']
+            answer = carddb[card]['answer']
+            interval = float(carddb[card]['interval'])
+            reps = int(carddb[card]['reps'])
+            schedule = float(carddb[card]['schedule'])
+            if schedule == 0:
+                schedule = t.time()
+            fails = int(carddb[card]['fails'])
+            leech = int(carddb[card]['leech'])
+            ease = float(carddb[card]['ease'])
+            same_day = int(carddb[card]['same_day'])
+            PIC = int(carddb[card]['PIC'])
+            ID = card
+            KeyDrill.carddict.update({card: KeyDrill(ID,question,answer,interval,\
+                                              reps,schedule,fails,\
+                                              leech,ease,same_day,PIC)})
+
+
+
 
 def commit_changes():
     with open(location, 'w') as configfile:
         carddb.write(configfile)
 
 def check_schedules():
-    fcarddict = {}
-    entrycarddict = {}
-    keydrilldict = {}
 
-    def flashcard_handler(card):
-        nonlocal fcarddict
-        if card not in fcarddict:
-            question = carddb[card]['question']
-            answer = carddb[card]['answer']
-            interval = float(carddb[card]['interval'])
-            reps = int(carddb[card]['reps'])
-            schedule = float(carddb[card]['schedule'])
-            if schedule == 0:
-                schedule = t.time()
-            fails = int(carddb[card]['fails'])
-            leech = int(carddb[card]['leech'])
-            ease = float(carddb[card]['ease'])
-            same_day = int(carddb[card]['same_day'])
-            PIC = int(carddb[card]['PIC'])
-            ID = card
-            fcarddict.update({card: FlashCard(ID,question,answer,interval,\
-                                              reps,schedule,fails,\
-                                              leech,ease,same_day,PIC)})
+    EntryCard.carddict = {}
+    FlashCard.carddict = {}
+    KeyDrill.carddict = {}
 
-    def entrycard_handler(card):
-        nonlocal entrycarddict
-        if card not in entrycarddict:
-            question = carddb[card]['question']
-            answer = carddb[card]['answer']
-            interval = float(carddb[card]['interval'])
-            reps = int(carddb[card]['reps'])
-            schedule = float(carddb[card]['schedule'])
-            if schedule == 0:
-                schedule = t.time()
-            fails = int(carddb[card]['fails'])
-            leech = int(carddb[card]['leech'])
-            ease = float(carddb[card]['ease'])
-            same_day = int(carddb[card]['same_day'])
-            PIC = int(carddb[card]['PIC'])
-            ID = card
-            entrycarddict.update({card: EntryCard(ID,question,answer,interval,\
-                                              reps,schedule,fails,\
-                                              leech,ease,same_day,PIC)})
-
-
-    def keydrill_handler(card):
-        nonlocal keydrilldict
-        if card not in keydrilldict:
-            question = carddb[card]['question']
-            answer = carddb[card]['answer']
-            interval = float(carddb[card]['interval'])
-            reps = int(carddb[card]['reps'])
-            schedule = float(carddb[card]['schedule'])
-            if schedule == 0:
-                schedule = t.time()
-            fails = int(carddb[card]['fails'])
-            leech = int(carddb[card]['leech'])
-            ease = float(carddb[card]['ease'])
-            same_day = int(carddb[card]['same_day'])
-            PIC = int(carddb[card]['PIC'])
-            ID = card
-            keydrilldict.update({card: KeyDrill(ID,question,answer,interval,\
-                                              reps,schedule,fails,\
-                                              leech,ease,same_day,PIC)})
-
-
-    cardhandler = {'FlashCard' : flashcard_handler,\
-                   'EntryCard' : entrycard_handler,\
-                   'KeyDrill' : keydrill_handler}
 
     for x in carddb.sections():
         if float(carddb[x]['schedule']) < t.time():
-            print(float(carddb[x]['schedule']),t.time())
-            cardhandler[carddb[x]['type']](x)
-
-    return({'fcards': fcarddict,\
-            'entrycards' : entrycarddict,\
-            'keydrills' : keydrilldict\
-          }) #add other types later
+            eval(carddb[x]['type']).handler(x)
 
 import flashcard
 import entrycard
@@ -169,67 +211,9 @@ def make_changes(card):
 
 from subprocess import call
 
-def do_fcards():
-    try:
-        for x in do_us['fcards'].values():
-            flashcard.cardlist.append(x)
+do_cardtype = [FlashCard.do_cards, EntryCard.do_cards, KeyDrill.do_cards]
 
-        if flashcard.cardlist:
-            call(["notify-send", "You've got flashcards to attend to!"])
-            dummy = s.accept() #wait for input
-
-        flashcard.start()
-
-        for card in do_us['fcards'].values():
-            make_changes(card)
-
-        commit_changes()
-        flashcard.cardlist = []
-    except StopIteration:
-        pass
-
-def do_entrycards():
-    try:
-        for x in do_us['entrycards'].values():
-            entrycard.cardlist.append(x)
-
-        if entrycard.cardlist:
-            call(["notify-send", "You've got entrycards to attend to!"])
-            dummy = s.accept() #wait for input
-
-        entrycard.start()
-
-        for card in do_us['entrycards'].values():
-            make_changes(card)
-
-        commit_changes()
-        entrycard.cardlist = []
-    except StopIteration:
-        pass
-
-def do_keydrills():
-    try:
-        for x in do_us['keydrills'].values():
-            keydrill.cardlist.append(x)
-
-        if keydrill.cardlist:
-            call(["notify-send", "You've got keydrills to attend to!"])
-            dummy = s.accept() #wait for input
-
-        keydrill.start()
-
-        for card in do_us['keydrills'].values():
-            make_changes(card)
-
-        commit_changes()
-        keydrill.cardlist = []
-    except StopIteration:
-        pass
-
-
-do_cardtype = [do_fcards, do_entrycards, do_keydrills]
-
-"""import configparser
+import configparser
 import os
 config = configparser.ConfigParser()
 config.read_file(open(os.getenv('HOME')+'/.config/tenjin/config'))
@@ -250,14 +234,4 @@ while 1:
     for func in do_cardtype:
         func()
     t.sleep(300)
-"""
 
-def str_to_list(list_):
-#     list_ = list_.replace('\n', '')
-    list_ = list(eval(list_))
-    for x in range(len(list_)):
-        try:
-            list_[x] = str_to_list(list_[x])
-        except:
-            pass
-    return(list_)
