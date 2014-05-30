@@ -27,7 +27,11 @@ class Card():
         else:
             try:
                 self.interval = \
-                [10,30,60,240,480,1,4][[0,1,2,3,4,5,6].index(self.reps)]
+                [10,30,60,240,480,1,4][self.reps] #feels kinda crammed this way. maybe mark
+                                                  #non-new as non-urgent, spread them over 4 daily chunks
+                                                  #but also remove large spreads as included now.
+                                                  #Is 10 mins for first fine?
+#                [10,30,60,240,480,1,4][[0,1,2,3,4,5,6].index(self.reps)] How did this happen?
                 #if reps < 7, defaults
             except:
                 if not self.ease < 0:
