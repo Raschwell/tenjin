@@ -237,5 +237,5 @@ while 1:
     do_us = check_schedules()
     for func in do_cardtype:
         func()
-    t.sleep(300)
+    t.sleep(30)
 

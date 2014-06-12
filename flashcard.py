@@ -16,9 +16,13 @@ def start():
             nonlocal AnsFrame
             AnsFrame = tk.Frame(Root)
             AnsFrame.pack()
-            AnsLab = tk.Label(AnsFrame, text = Card.answer)
-            AnsLab['font'] = ('times', 15, 'bold')
-            AnsLab['height'] = 3
+            if Card.answer == '[IMG]':
+                Card.Aphoto = tk.PhotoImage(file="/var/tenjin/img/{}.A.png".format(Card.ID))
+                AnsLab = tk.Label(AnsFrame, image = Card.Aphoto)
+            else:
+                AnsLab = tk.Label(AnsFrame, text = Card.answer)
+                AnsLab['font'] = ('times', 15, 'bold')
+                AnsLab['height'] = 3
             AnsLab.pack() 
             def fun(i):
                 rate(i)
@@ -43,7 +47,14 @@ def start():
             try:
                 nonlocal Card
                 Card = next(iter_cardlist)
-                QLab['text'] = Card.question
+                if Card.question == '[IMG]':
+                    Card.Qphoto = tk.PhotoImage(file="/var/tenjin/img/{}.Q.png".format(Card.ID))
+                    QLab['text'] = ""
+                    QLab['image'] = Card.Qphoto
+                else:
+                    QLab['text'] = Card.question
+                    QLab['image'] = ""
+                    
             except StopIteration:
                 Revealer.destroy()
                 QLab['text'] = 'You\'re done'

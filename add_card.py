@@ -11,7 +11,7 @@ import sys
 
 def addcard(ID,cardtype,question,answer):
     config = configparser.ConfigParser()
-    config.read_file(open('/usr/home/michael/.config/tenjin/config'))
+    config.read_file(open('/usr/home/dennis/.config/tenjin/config'))
     location = config['Main']['location']
 
     carddb = configparser.ConfigParser()
