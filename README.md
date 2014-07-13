@@ -10,3 +10,5 @@ To be done
      Bug-me-not if I am doing work/studying. Keep a journal.
   * Link to source, integration with document library:
      Link cards to annotations, websites.
+  * Quick-edit cards.
+  * Statistics
