@@ -12,3 +12,4 @@ To be done
      Link cards to annotations, websites.
   * Quick-edit cards.
   * Statistics
+  * Complex cards: TeX, multiple questions&answers in one card, audio(?)
