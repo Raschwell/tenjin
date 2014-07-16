@@ -13,3 +13,4 @@ To be done
   * Quick-edit cards.
   * Statistics
   * Complex cards: TeX, multiple questions&answers in one card, audio(?)
+  * Integrate into outliner
