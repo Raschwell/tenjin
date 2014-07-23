@@ -23,7 +23,7 @@ def start():
                 AnsLab = tk.Label(AnsFrame, text = Card.answer)
                 AnsLab['font'] = ('times', 15, 'bold')
                 AnsLab['height'] = 3
-            AnsLab.pack() 
+            AnsLab.pack()
             def fun(i):
                 rate(i)
             for i in range(0,6):
@@ -54,16 +54,49 @@ def start():
                 else:
                     QLab['text'] = Card.question
                     QLab['image'] = ""
-                    
+
             except StopIteration:
                 Revealer.destroy()
+                QLab['image'] = ""
                 QLab['text'] = 'You\'re done'
                 Root.bind('<KP_Enter>', lambda dummy: Root.destroy())
                 Root.bind('<Return>', lambda dummy: Root.destroy())
                 Root.bind('<space>',lambda dummy: Root.destroy())
 
+    def edit_mode():
+
+      QLab['text'] = ''
+      QEntry = tk.Entry(QFrame)
+      QEntry.pack(fill=tk.X)
+      QEntry.insert(0, Card.question)
+      nonlocal AnsFrame
+      AnsFrame.destroy()
+      AnsFrame = tk.Frame(Root)
+      AnsFrame.pack(fill=tk.X)
+      AEntry = tk.Entry(AnsFrame)
+      AEntry.pack(fill=tk.X)
+      AEntry.insert(0, Card.answer)
+      Root.bind('<Return>', lambda dummy: send_edits())
+      Root.bind('<space>', lambda dummy: print(''))
+      Root.bind('e', lambda dummy: print(''))
+      def send_edits():
+        Card.question = QEntry.get()
+        Card.answer = AEntry.get()
+        AnsFrame.destroy()
+        QEntry.pack_forget()
+        Root.bind('<Return>', lambda dummy: rev_ans())
+        Root.bind('e', lambda dummy: edit_mode())
+        QLab['text'] = Card.question
+
+    def fdel():
+      Card.schedule = 10**12
+      Card.same_day = 0
+      Card.PIC = 1
+
     Root = tk.Tk()
-    QLab = tk.Label(Root, text = Card.question)
+    QFrame = tk.Frame()
+    QFrame.pack(fill=tk.X)
+    QLab = tk.Label(QFrame, text = Card.question)
     QLab.pack()
     QLab['font'] = ('times', 20, 'bold')
     Revealer = tk.Button(Root, text = "Reveal", command = rev_ans)
@@ -76,4 +109,6 @@ def start():
     Root.bind('<KP_Enter>', lambda dummy: rev_ans())
     Root.bind('<Return>', lambda dummy: rev_ans())
     Root.bind('<space>', lambda dummy: rev_ans())
+    Root.bind('<Control_L>e', lambda dummy: edit_mode())
+    Root.bind('<Control_L>d', lambda dummy: fdel())
     Root.mainloop()

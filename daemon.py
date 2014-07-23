@@ -1,6 +1,8 @@
 import time as t
 import random
 
+max_interval = 915
+
 class Card():
     def __init__(self,ID,question = '' ,answer = '' ,interval = 0, reps = 0,scheduled = t.time(), fails = 0, leech = 0, ease = 2.5, same_day = 1, PIC = 0):
         self.PIC = 0 #passed initial 'cram', just so that you recognize it next time
@@ -11,28 +13,18 @@ class Card():
         self.answer = answer
         self.scheduled = scheduled
         self.interval = interval
-        self.max_interval = 915
         self.ease = ease
         self.same_day = same_day #if true, intervals are in minutes
         self.ID = ID
     def set_interval(self,rating):
         if self.PIC:
             self.set_ease(rating)
-        if rating in [0,1] and self.PIC: #set ease nevertheless
-            self.interval = 0            #you failed w 2.5, after all
-            self.fails += 1
-            self.reps += 1
-        if rating in [0,1,2] and not self.PIC:
-            pass
-        else:
+            if rating in [0,1]: #set ease nevertheless
+                self.interval = 1            #you failed w 2.5, after all
+                self.reps += 1
+        if not (rating in [0,1,2] and not self.PIC):
             try:
-                self.interval = \
-                [10,30,60,240,480,1,4][self.reps] #feels kinda crammed this way. maybe mark
-                                                  #non-new as non-urgent, spread them over 4 daily chunks
-                                                  #but also remove large spreads as included now.
-                                                  #Is 10 mins for first fine?
-#                [10,30,60,240,480,1,4][[0,1,2,3,4,5,6].index(self.reps)] How did this happen?
-                #if reps < 7, defaults
+                self.interval = [60,240,1,4][self.reps]
             except:
                 if not self.ease < 0:
                     if not rating == 1 : #don't expand schedule on bad answer
@@ -44,11 +36,9 @@ class Card():
                 if not self.PIC : self.PIC = 1
                 if self.PIC:
                     self.reps += 1
-                if self.reps > 5: self.same_day = 0
-                if self.fails > 7:
-                    self.leech = 1
-        if self.max_interval and self.interval > self.max_interval:
-            self.interval = self.max_interval
+                if self.reps > 2: self.same_day = 0
+        if self.interval > max_interval:
+            self.interval = max_interval
         self.interval *= random.randrange(900,1100)/1000 #generate some noise]
         self.schedule_func()
     def set_ease(self,rating):
@@ -72,6 +62,10 @@ class FlashCard(Card):
             if flashcard.cardlist:
                 call(["notify-send", "You've got flashcards to attend to!"])
                 dummy = s.accept() #wait for input
+                global carddb
+                carddb = configparser.ConfigParser()
+                carddb.read_file(open(location))
+
 
             flashcard.start()
 
@@ -212,6 +206,8 @@ def make_changes(card):
     carddb[card.ID]['ease'] = str(card.ease)
     carddb[card.ID]['same_day'] = str(card.same_day)
     carddb[card.ID]['PIC'] = str(card.PIC)
+    carddb[card.ID]['question'] = str(card.question)
+    carddb[card.ID]['answer'] = str(card.answer)
 
 from subprocess import call
 
@@ -237,5 +233,5 @@ while 1:
     do_us = check_schedules()
     for func in do_cardtype:
         func()
-    t.sleep(30)
+    t.sleep(1)
 

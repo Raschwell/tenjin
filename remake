@@ -1,0 +1,31 @@
+Database
+
+Daemon
+  Periodically check database items for anything scheduled
+  Keep track of pomodoros, don't bug me if in one
+  Trickling
+
+Card viewer
+  Quick-edit cards
+  TeX
+  Images
+  Links to source
+  Show hashtags at bottom
+  Multiple questions/progressions
+  Stuff with priority tags [like "math" or explicit "priority=fuckinghigh"] shoved to beginning of list
+  Show cards left, w various priority tags. Do cards in priority chunks?
+
+Quick Card Creator
+  Call hotkey, create a card
+  Add #hashtags
+  Add to [topic]
+
+Card selector(?) #May just be a trivial inconvenience, hashtags serve as topic markers. Cardviewer could order by them,too
+  Select by type
+
+Workflow:
+  * Daemon bugs me
+  * I hotkey start the card|topic selector, going down by topic{is this whole thing needed?}
+  * Card selector calls cardviewer
+  * Cardviewer reads data from db
+  * Cardviewer events manipulate database
